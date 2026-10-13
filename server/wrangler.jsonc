@@ -1,0 +1,70 @@
+// Ludo Royale game server: a Cloudflare Worker with two Durable Object classes and the web client
+// as static assets. `npm run dev` runs it locally; `npm run deploy` publishes it (after `wrangler login`).
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "ludo-royale",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-20",
+  "workers_dev": true,
+  // Custom domain (optional): uncomment and set your hostname once its zone is on Cloudflare.
+  // "routes": [{ "pattern": "ludo.example.com", "custom_domain": true }],
+
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    // /r/<CODE> and /f/<code> are client-side routes: unknown paths get index.html.
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/ws/*"]
+  },
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "ROOMS", "class_name": "RoomDO" },
+      { "name": "PLAYERS", "class_name": "PlayerDO" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RoomDO", "PlayerDO"] }],
+
+  // Per-IP limits (keys are IP addresses; nothing is stored).
+  "ratelimits": [
+    { "name": "IDENTITY_LIMIT", "namespace_id": "4101", "simple": { "limit": 10, "period": 60 } },
+    { "name": "ROOM_LIMIT", "namespace_id": "4102", "simple": { "limit": 20, "period": 60 } },
+    { "name": "CONNECT_LIMIT", "namespace_id": "4103", "simple": { "limit": 120, "period": 60 } }
+  ],
+
+  "vars": {
+    // Web pages that may open game connections besides this Worker's own origin (comma-separated).
+    // https://app.ludoroyale.example is the Windows app's built-in copy of the web client.
+    "ALLOWED_ORIGINS": "https://app.ludoroyale.example",
+    "TURN_MS": "20000",
+    "GRACE_MS": "30000",
+    "BOT_DELAY_MS": "900",
+    "ROOM_TTL_MS": "7200000"
+  },
+
+  "observability": { "enabled": true },
+
+  "env": {
+    // `wrangler dev --env test`: the integration tests (short timers, roomier limits).
+    "test": {
+      "durable_objects": {
+        "bindings": [
+          { "name": "ROOMS", "class_name": "RoomDO" },
+          { "name": "PLAYERS", "class_name": "PlayerDO" }
+        ]
+      },
+      "ratelimits": [
+        { "name": "IDENTITY_LIMIT", "namespace_id": "4201", "simple": { "limit": 40, "period": 60 } },
+        { "name": "ROOM_LIMIT", "namespace_id": "4202", "simple": { "limit": 60, "period": 60 } },
+        { "name": "CONNECT_LIMIT", "namespace_id": "4203", "simple": { "limit": 600, "period": 60 } }
+      ],
+      "vars": {
+        "ALLOWED_ORIGINS": "https://app.ludoroyale.example",
+        "TURN_MS": "2500",
+        "GRACE_MS": "1500",
+        "BOT_DELAY_MS": "60",
+        "ROOM_TTL_MS": "40000"
+      }
+    }
+  }
+}

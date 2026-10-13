@@ -1,0 +1,13 @@
+import puppeteer from "puppeteer-core";
+const [,, url, out, theme = "light", w = "420", h = "860"] = process.argv;
+const browser = await puppeteer.launch({ executablePath: "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe", headless: true, args: ["--no-first-run", "--mute-audio"] });
+const page = await browser.newPage();
+await page.setViewport({ width: Number(w), height: Number(h), deviceScaleFactor: 2 });
+await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: theme }]);
+page.on("console", (m) => console.log("console:", m.type(), m.text()));
+page.on("pageerror", (e) => console.log("pageerror:", e.message));
+await page.goto(url, { waitUntil: "networkidle0" });
+await new Promise((r) => setTimeout(r, 800));
+await page.screenshot({ path: out });
+await browser.close();
+console.log("ok", out);

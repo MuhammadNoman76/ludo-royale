@@ -1,0 +1,14 @@
+node_modules/
+web/dist/
+server/worker-configuration.d.ts
+.wrangler/
+.dev.vars
+*.log
+bin/
+obj/
+publish/
+dist/
+.vs/
+*.user
+TestResults/
+tools/e2e/out/
