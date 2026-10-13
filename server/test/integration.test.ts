@@ -98,6 +98,15 @@ describe("room protocol", () => {
     expect(c.errors.some((e) => e.startsWith("slow-down"))).toBe(true);
   });
 
+  it("gives people who join at the same moment different seats", async () => {
+    const code = await newRoom();
+    const clients = await Promise.all(["Ali", "Bo", "Cy", "Di", "Ed"].map((n) => RoomClient.join(code, n)));
+    clients.forEach(track);
+    const seats = clients.map((c) => c.you);
+    expect(seats.filter((s) => s !== null).sort()).toEqual([0, 1, 2, 3]);
+    expect(seats.filter((s) => s === null)).toHaveLength(1); // the fifth one watches
+  });
+
   it("says when a room doesn't exist", async () => {
     const c = track(new RoomClient("ZZZZ"));
     await c.open();

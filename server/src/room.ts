@@ -397,16 +397,13 @@ export class RoomDO extends DurableObject<Env> {
     }
 
     if (you === null && d.phase === "lobby") {
+      // Hash first: nothing may await between choosing a free seat and taking it.
+      const fresh = newSecret(18);
+      const freshHash = await sha256Hex(fresh);
       const free = SEAT_ORDER.find((i) => d.seats[i]!.kind === "empty");
-      if (free !== undefined) {
-        secret = newSecret(18);
-        d.seats[free] = {
-          ...emptySeat(),
-          kind: "human",
-          name: name.name,
-          secretHash: await sha256Hex(secret),
-          friend: msg.friend ?? null,
-        };
+      if (free !== undefined && d.phase === "lobby") {
+        secret = fresh;
+        d.seats[free] = { ...emptySeat(), kind: "human", name: name.name, secretHash: freshHash, friend: msg.friend ?? null };
         you = free;
       }
     }
