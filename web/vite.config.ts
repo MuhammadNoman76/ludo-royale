@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { type Plugin, defineConfig } from "vite";
 
@@ -16,6 +17,18 @@ const CSP = [
   "form-action 'none'",
   "manifest-src 'self'",
 ].join("; ");
+
+/** Ships the third-party licence texts with the client (shown in Settings). */
+function notices(): Plugin {
+  return {
+    name: "ludo-notices",
+    apply: "build",
+    generateBundle() {
+      const source = fileURLToPath(new URL("../THIRD-PARTY-NOTICES.txt", import.meta.url));
+      this.emitFile({ type: "asset", fileName: "third-party-notices.txt", source: readFileSync(source, "utf8") });
+    },
+  };
+}
 
 function csp(): Plugin {
   return {
@@ -40,5 +53,5 @@ export default defineConfig({
     reportCompressedSize: true,
   },
   server: { port: 5173, fs: { allow: [".."] } },
-  plugins: [csp()],
+  plugins: [csp(), notices()],
 });

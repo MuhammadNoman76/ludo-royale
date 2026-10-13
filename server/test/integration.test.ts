@@ -41,6 +41,19 @@ describe("HTTP API", () => {
     await expect(evil.open()).rejects.toThrow(/403/);
   });
 
+  it("lets the Windows app read API answers (CORS), and nobody else", async () => {
+    const app = await post("/api/rooms", APP_ORIGIN);
+    expect(app.headers.get("access-control-allow-origin")).toBe(APP_ORIGIN);
+    const own = await post("/api/rooms");
+    expect(own.headers.get("access-control-allow-origin")).toBeNull();
+    const preflight = await fetch(`${BASE}/api/identity`, { method: "OPTIONS", headers: { Origin: APP_ORIGIN, "Access-Control-Request-Method": "POST" } });
+    expect(preflight.status).toBe(204);
+    expect(preflight.headers.get("access-control-allow-origin")).toBe(APP_ORIGIN);
+    const evil = await fetch(`${BASE}/api/identity`, { method: "OPTIONS", headers: { Origin: "https://evil.example", "Access-Control-Request-Method": "POST" } });
+    expect(evil.status).toBe(403);
+    expect(evil.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
   it("hands out friend codes and room codes", async () => {
     const id = await newIdentity();
     expect(id.code).toMatch(/^LUDO-[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{4}$/);
@@ -139,7 +152,7 @@ describe("full games", () => {
 
     // Rematch goes back to the lobby with the same people.
     b.send({ t: "rematch" });
-    expect(await b.wait((m) => m.t === "error")).toMatchObject({ message: "Only the host can do that." });
+    expect(await b.wait((m) => m.t === "error" && m.code === "rule")).toMatchObject({ message: "Only the host can do that." });
     a.send({ t: "rematch" });
     const lobby = await a.waitRoom((r) => r.phase === "lobby");
     expect(lobby.seats.map((s) => s.kind)).toEqual(["human", "human", "bot", "bot"]);

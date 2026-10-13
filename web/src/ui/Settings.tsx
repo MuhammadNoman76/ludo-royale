@@ -89,6 +89,8 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         </section>
       )}
 
+      <Licences />
+
       <section class="card subtle">
         <div class="eyebrow">Privacy</div>
         <p class="small muted">
@@ -97,5 +99,30 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         </p>
       </section>
     </Drawer>
+  );
+}
+
+function Licences() {
+  const [text, setText] = useState<string | null>(null);
+  return (
+    <section class="card subtle">
+      <button
+        type="button"
+        class="btn link"
+        aria-expanded={text !== null}
+        onClick={async () => {
+          if (text !== null) return setText(null);
+          try {
+            const r = await fetch("/third-party-notices.txt");
+            setText(r.ok ? await r.text() : "Not available.");
+          } catch {
+            setText("Not available.");
+          }
+        }}
+      >
+        Open-source licences
+      </button>
+      {text !== null && <pre class="licences">{text}</pre>}
+    </section>
   );
 }

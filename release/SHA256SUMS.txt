@@ -1,0 +1,2 @@
+9d267511abd696d5ad35eef8105c4bbba84ff1fa5a550218b2515b11bf2a8bfa  LudoRoyale-1.0.0-portable.zip
+36b30268fc8342475b675a350ba6190bb5389e8d9bcd84791d61e998037543a2  LudoRoyale-Setup-1.0.0.exe

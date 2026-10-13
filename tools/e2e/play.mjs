@@ -87,6 +87,10 @@ function autoplay(c) {
 const a = await client("Noman", "light", [430, 900]);
 const b = await client("Sara", "dark", [430, 900]);
 try {
+  await a.page.waitForFunction(() => document.querySelector(".status-dot.online"), { timeout: 20000 });
+  await shot(a, "home.png");
+  await shot(b, "home-dark.png");
+
   // ---- friends: Sara adds Noman by code, Noman accepts from the toast
   const codeA = await friendCode(a.page);
   log("Noman's friend code", codeA);

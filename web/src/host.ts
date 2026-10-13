@@ -55,6 +55,15 @@ export const host = new Store<HostState>({
   update: null,
 });
 
+type ToastListener = (text: string) => void;
+const toastListeners = new Set<ToastListener>();
+
+/** Short messages from the app (for example the result of "Check for updates"). */
+export function onHostToast(listener: ToastListener): () => void {
+  toastListeners.add(listener);
+  return () => toastListeners.delete(listener);
+}
+
 export type HostLink = { kind: "join"; value: string } | { kind: "friend"; value: string };
 type LinkListener = (link: HostLink) => void;
 const linkListeners = new Set<LinkListener>();
@@ -124,6 +133,8 @@ function onMessage(data: unknown): void {
         settings: readSettings(m.settings, s.settings),
         window: readWindow(m.window, s.window),
       });
+      // Tell the app the page is up (when it started in the tray it can hide its window now).
+      postToHost({ type: "started" });
       break;
     }
     case "link": {
@@ -135,6 +146,11 @@ function onMessage(data: unknown): void {
     case "settings":
       host.set({ ...s, settings: readSettings(m.settings, s.settings) });
       break;
+    case "toast": {
+      const text = str(m.text);
+      if (text && text.length <= 200) for (const l of toastListeners) l(text);
+      break;
+    }
     case "window":
       host.set({ ...s, window: readWindow(m, s.window) });
       break;
@@ -157,8 +173,14 @@ function onMessage(data: unknown): void {
 
 if (isApp) {
   webview!.addEventListener("message", (e) => onMessage(e.data));
-  // Ask for the init message (the host also sends it when the page finishes loading).
-  queueMicrotask(() => postToHost({ type: "ready" }));
+  // Ask for the init message, and ask again until it arrives (the app may still be starting up).
+  let asks = 0;
+  const ask = () => {
+    if (host.get().ready || asks++ > 30) return;
+    postToHost({ type: "ready" });
+    setTimeout(ask, 1000);
+  };
+  queueMicrotask(ask);
 }
 
 /** Opens an https link outside the game (the app hands it to the default browser). */

@@ -1027,8 +1027,8 @@ p {
 
 .board-wrap {
   position: relative;
-  width: min(100%, calc(100vh - 210px));
-  width: min(100%, calc(100dvh - 210px));
+  width: min(100%, calc(100vh - 250px));
+  width: min(100%, calc(100dvh - 250px));
   min-width: min(100%, 280px);
   aspect-ratio: 1;
   margin: 0 auto;
@@ -1383,7 +1383,7 @@ p {
   border: 1px solid var(--line);
   border-left: 5px solid var(--c);
   box-shadow: var(--shadow);
-  max-width: min(100%, calc(100dvh - 210px));
+  max-width: min(100%, calc(100dvh - 250px));
   min-width: min(100%, 280px);
 }
 
@@ -1632,4 +1632,44 @@ p {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ---------------------------------------------------------------- rules, small links */
+
+.row.top {
+  align-items: flex-start;
+}
+
+.rules summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style-position: inside;
+}
+
+.rules ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.rules li + li {
+  margin-top: 6px;
+}
+
+.open-in-app {
+  margin: 12px 0 0;
+}
+
+a {
+  color: var(--accent-2);
+}
+
+.licences {
+  white-space: pre-wrap;
+  font-size: 0.72rem;
+  max-height: 320px;
+  overflow: auto;
+  margin: 8px 0 0;
+  color: var(--muted);
 }

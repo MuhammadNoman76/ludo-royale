@@ -39,6 +39,14 @@ function windowFocused(): boolean {
   return !document.hidden && document.hasFocus();
 }
 
+// "Your turn" comes every few seconds in a game: notify once, then wait until the player is back.
+let turnAlerted = false;
+const back = () => {
+  if (windowFocused()) turnAlerted = false;
+};
+document.addEventListener("visibilitychange", back);
+window.addEventListener("focus", back);
+
 /** A system notification when the player isn't looking at the game (the app decides for itself). */
 export function systemAlert(alert: Alert, onClick?: () => void): void {
   if (isApp) {
@@ -46,6 +54,10 @@ export function systemAlert(alert: Alert, onClick?: () => void): void {
     return;
   }
   if (windowFocused() || !prefs.get().notifications) return;
+  if (alert.kind === "turn") {
+    if (!document.hidden || turnAlerted) return;
+    turnAlerted = true;
+  }
   if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
   try {
     const n = new Notification(alert.title, { body: alert.body, tag: `${alert.kind}:${alert.room ?? alert.friend ?? ""}`, icon: "/icon-192.png" });

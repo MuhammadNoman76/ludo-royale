@@ -5,7 +5,7 @@ import type { Session } from "../session.js";
 import { useStore } from "../store.js";
 import { Avatar, Segmented, colorName } from "./common.js";
 import { Icon } from "./Icons.js";
-import { ShareRoom } from "./Share.js";
+import { OpenInApp, ShareRoom } from "./Share.js";
 
 interface Props {
   session: Session;
@@ -160,6 +160,7 @@ export function Lobby({ session, room, you, onLeave }: Props) {
         )}
       </div>
       {isHost && problem && <p class="muted small center">{problem}</p>}
+      <OpenInApp code={room.code} />
     </div>
   );
 }

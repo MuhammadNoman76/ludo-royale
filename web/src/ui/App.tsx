@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { checkName, normalizeFriendCode, normalizeRoomCode } from "../../../shared/src/protocol.js";
 import { friends, startFriends } from "../friends.js";
-import { host, isApp, onHostLink, postToHost } from "../host.js";
-import { dismiss, toasts } from "../notify.js";
+import { host, isApp, onHostLink, onHostToast, postToHost } from "../host.js";
+import { dismiss, toast, toasts } from "../notify.js";
 import { prefs, setPref } from "../prefs.js";
 import { type Route, navigate, route } from "../router.js";
 import { LocalSession, OnlineSession, type Session, type SoloOptions, soloDefaults } from "../session.js";
@@ -16,6 +16,7 @@ import { Icon } from "./Icons.js";
 import { Lobby } from "./Lobby.js";
 import { Logo } from "./Logo.js";
 import { SettingsPanel } from "./Settings.js";
+import { OpenInApp } from "./Share.js";
 
 type Panel = "friends" | "settings" | null;
 
@@ -45,6 +46,8 @@ export function App() {
   useEffect(() => {
     if (h.ready) void startFriends();
   }, [h.ready]);
+
+  useEffect(() => onHostToast((text) => toast(text)), []);
 
   // ludoroyale:// links, tray and notification clicks.
   useEffect(
@@ -235,12 +238,14 @@ function RoomScreen({ code }: { code: string }) {
           <button type="button" class="btn primary wide" disabled={!checkName(p.name).ok} onClick={() => setConfirmedName(prefs.get().name)}>
             Join
           </button>
+          <OpenInApp code={code} />
         </section>
       </div>
     );
   }
   return <OnlineRoom code={code} name={confirmedName} />;
 }
+
 
 function OnlineRoom({ code, name }: { code: string; name: string }) {
   const session = useMemo(() => new OnlineSession(code, name), [code]);

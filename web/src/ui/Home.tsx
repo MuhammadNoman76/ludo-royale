@@ -172,9 +172,24 @@ export function Home({ friendCode }: { friendCode?: string }) {
         </button>
       </section>
 
+      <section class="card subtle" aria-label="How to play">
+        <details class="rules">
+          <summary>How to play</summary>
+          <ul>
+            <li>Roll a <strong>6</strong> to bring a token out of your yard. A 6 also gives you another roll, but three 6s in a row lose the turn.</li>
+            <li>Move a token by the number rolled. Landing on an opponent sends it back to its yard and gives you another roll.</li>
+            <li>Stars and the coloured start squares are safe: nobody can be captured there.</li>
+            <li>Walk all the way round into your coloured home column. You need the exact number to reach home (another roll as a reward).</li>
+            <li>Classic: bring all four tokens home. Quick: one token starts out and two home win.</li>
+            <li>2 vs 2: opposite corners are partners. Once your tokens are home you move your partner's.</li>
+            <li>Keyboard: Space rolls, 1 to 4 move a token. Each turn has a timer; a bot steps in if you're away.</li>
+          </ul>
+        </details>
+      </section>
+
       {!isApp && /Windows/.test(navigator.userAgent) && (
         <section class="card subtle" aria-label="Windows app">
-          <div class="row">
+          <div class="row top">
             <Icon name="download" size={22} />
             <div class="grow">
               <strong>Ludo Royale for Windows</strong>

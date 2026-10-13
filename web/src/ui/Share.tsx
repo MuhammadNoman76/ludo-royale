@@ -81,3 +81,13 @@ function InviteFriends({ code }: { code: string }) {
     </div>
   );
 }
+
+/** Browser players on Windows who have the app can open the room there (ludoroyale:// link). */
+export function OpenInApp({ code }: { code: string }) {
+  if (isApp || !/Windows/.test(navigator.userAgent)) return null;
+  return (
+    <p class="small muted center open-in-app">
+      Have Ludo Royale for Windows? <a href={`ludoroyale://join/${code}`}>Open this room in the app</a>
+    </p>
+  );
+}

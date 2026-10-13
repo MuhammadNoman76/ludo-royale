@@ -42,7 +42,8 @@
     "ROOM_TTL_MS": "7200000"
   },
 
-  "observability": { "enabled": true },
+  // Off: Cloudflare would otherwise keep request logs. `wrangler tail` still shows live logs on demand.
+  "observability": { "enabled": false },
 
   "env": {
     // `wrangler dev --env test`: the integration tests (short timers, roomier limits).
