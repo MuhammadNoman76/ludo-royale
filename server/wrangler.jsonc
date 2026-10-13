@@ -6,8 +6,8 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-20",
   "workers_dev": true,
-  // Custom domain (optional): uncomment and set your hostname once its zone is on Cloudflare.
-  // "routes": [{ "pattern": "ludo.example.com", "custom_domain": true }],
+  // Custom domain: nomanshafiq.com is on Cloudflare, so the Worker answers on this hostname.
+  "routes": [{ "pattern": "ludo.nomanshafiq.com", "custom_domain": true }],
 
   "assets": {
     "directory": "../web/dist",
